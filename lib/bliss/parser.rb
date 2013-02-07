@@ -170,87 +170,47 @@ module Bliss
             end
           end
         end
-        
-        http.stream { |chunk|
-          if chunk
-            chunk.force_encoding('UTF-8')
-            case compression
-              when :gzip
-                chunk = parser.zstream.inflate(chunk)
-                chunk.force_encoding('UTF-8')
+
+        decoder_class = nil
+        decoder = nil
+
+        http.stream do |chunk|
+          if compression != :none and decoder.nil?
+            # valid decoders: "gzip", "deflate"
+            decoder_class = EM::HttpDecoders.decoder_for_encoding(compression.to_s)
+            decoder = decoder_class.new do |chunk|
+              parser.parse_chunk(chunk)
             end
-
-            chunk.lines.each { |line|
-
-              if parser.check_unhandled_bytes?
-                parser.unhandled_bytes += line.length
-                parser.check_unhandled_bytes
-              end
-            
-              if not parser.parser_machine.is_closed?
-                begin
-                  if not parser.header
-                    parser.set_header(line)
-                  end
-                  parser.push_parser << line
-                rescue Nokogiri::XML::SyntaxError => e
-                  if e.message.include?("encoding")
-                    current_depth = parser.current_depth.dup
-                    current_node = parser.current_node.dup
-
-                    parser.initialize_push_parser
-                    parser.push_parser << parser.header
-                    #puts parser.header
-                    current_depth[0..-2].each { |tag|
-                      tag = "<#{tag}>"
-                      #puts tag
-                      parser.push_parser << tag
-                    }
-                    parser.parser_machine.ignore_next_close(current_depth[0..-2].join("/"))
-                    parser.trigger_error_callback("encoding", {
-                      :partial_node => current_node,
-                      :line => line}
-                    )
-                    #raise Bliss::EncodingError, "Wrong encoding given"
-                  end
-                  next
-                end
-                if @file
-                  @file << line
-                end
-              else
-                if parser.exceeded?
-                  #puts 'exceeded'
-                  parser.secure_close
-                else
-                  if @file
-                    if @wait_tag_close
-                      #puts 'handle wait'
-                      parser.handle_wait_tag_close(chunk) #if @wait_tag_close
-                    else
-                      #puts 'secure close'
-                      parser.secure_close
-                    end
-                  end
-                end
-              end
-            }
           end
-        }
-        http.errback {
+
+          if chunk
+            if decoder
+              decoder << chunk
+            else
+              parser.parse_chunk(chunk)
+            end
+          end
+        end
+
+        http.errback do
           #puts 'errback'
           if @timeout
             @on_timeout.call
           end
           parser.secure_close
-        }
-        http.callback {|http|
+        end
+
+        http.callback do |http|
+          if compression != :none
+            decoder.finalize!
+          end
           if @on_finished
             @on_finished.call(http)
           end
           parser.secure_close
-        }
+        end
       end
+
       file_close
     end
 
@@ -288,5 +248,66 @@ module Bliss
       end
     end
 
+    def parse_chunk(chunk)
+      chunk.force_encoding('UTF-8')
+
+      chunk.lines.each do |line|
+
+        if self.check_unhandled_bytes?
+          self.unhandled_bytes += line.length
+          self.check_unhandled_bytes
+        end
+
+        if not self.parser_machine.is_closed?
+          begin
+            if not self.header
+              self.set_header(line)
+            end
+            self.push_parser << line
+          rescue Nokogiri::XML::SyntaxError => e
+            puts e
+            if e.message.include?("encoding")
+              current_depth = self.current_depth.dup
+              current_node = self.current_node.dup
+
+              self.initialize_push_parser
+              self.push_parser << self.header
+              #puts self.header
+              current_depth[0..-2].each { |tag|
+                tag = "<#{tag}>"
+                #puts tag
+                self.push_parser << tag
+              }
+              self.parser_machine.ignore_next_close(current_depth[0..-2].join("/"))
+              self.trigger_error_callback("encoding", {
+                :partial_node => current_node,
+                :line => line
+              })
+              #raise Bliss::EncodingError, "Wrong encoding given"
+            end
+            next
+          end
+          if @file
+            @file << line
+          end
+        else
+          if self.exceeded?
+            #puts 'exceeded'
+            self.secure_close
+          else
+            if @file
+              if @wait_tag_close
+                #puts 'handle wait'
+                self.handle_wait_tag_close(chunk) #if @wait_tag_close
+              else
+                #puts 'secure close'
+                self.secure_close
+              end
+            end
+          end
+        end
+
+      end
+    end
   end
 end
