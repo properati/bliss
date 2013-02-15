@@ -4,6 +4,7 @@ require 'em-http-request'
 require 'zlib'
 
 require 'hash_extension'
+require "ext/em-http/decoders"
 
 require 'bliss/constraint'
 require 'bliss/constraint_set'
