@@ -4,7 +4,6 @@ module EventMachine::HttpDecoders
   class GZip < Base
     # @see https://github.com/igrigorik/em-http-request/issues/207
     def decompress_with_workaround(compressed)
-      puts "patched decompress"
       @buf ||= LazyStringIO.new
       @buf << compressed
 
