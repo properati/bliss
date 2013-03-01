@@ -41,8 +41,52 @@ class Hash
     depth.pop
   end
 end
-class String
+
+class StringWithAttrs
+  include Comparable
+
+  APOS = "'".freeze
+  APOS_RE = /'/.freeze
+  DOUBLE_APOS = "''".freeze
+
+  def initialize(str)
+    @data = str
+    @attrs = {}
+  end
+
   def attrs
-    @attrs ||= {}
+    @attrs
+  end
+
+  def <=>(other)
+    @data <=> other
+  end
+
+  def inspect
+    if @attrs.empty?
+      "#{@data.inspect} (@attrs=#{attrs.inspect})"
+    else
+      @data.inspect
+    end
+  end
+
+  def to_s
+    @data.to_s
+  end
+
+  def sql_literal(ds)
+    "" << APOS << gsub(APOS_RE, DOUBLE_APOS) << APOS
+  end
+
+  def method_missing(name, *args, &block)
+    if @data.respond_to?(name)
+      @data.send(name, *args, &block)
+    else
+      super
+    end
+  end
+
+  def respond_to?(name, include_private=false)
+    @data.respond_to?(name, include_private) || super
   end
 end
