@@ -41,17 +41,3 @@ class Hash
     depth.pop
   end
 end
-
-class StringWithAttrs < String
-  def attrs
-    @attrs ||= {}
-  end
-
-  def inspect
-    if @attrs.nil? || @attrs.empty?
-      super
-    else
-      "#{super} (@attrs=#{attrs.inspect})"
-    end
-  end
-end

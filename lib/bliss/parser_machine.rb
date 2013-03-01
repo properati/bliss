@@ -117,8 +117,8 @@ module Bliss
 			#puts "finishes: #{@nodes.inspect}"
 			#puts "\n"
 			
-      @current_content = StringWithAttrs.new('')
-      @current_content.attrs.merge!(Hash[*attributes.flatten])
+      @current_content = StringWithAttributes.new('')
+      @current_content.attributes.merge!(Hash[*attributes.flatten])
       @current_content
     end
 

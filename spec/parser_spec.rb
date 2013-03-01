@@ -166,9 +166,9 @@ describe Bliss::Parser do
       @parser.on_tag_close("root/item") { |hash, depth|
         #puts hash.inspect
         hash.should have_key("element")
-        hash["element"].attrs.should be_a Hash
-        hash["element"].attrs["attribute1"].should == "bla"
-        hash["element"].attrs["attribute2"].should == "blo"
+        hash["element"].attributes.should be_a Hash
+        hash["element"].attributes["attribute1"].should == "bla"
+        hash["element"].attributes["attribute2"].should == "blo"
       }
 
       @parser.parse
