@@ -4,6 +4,7 @@ module Bliss
     attr_reader :push_parser
     attr_reader :parser_machine
     attr_accessor :unhandled_bytes
+    attr_accessor :autodetect_compression
 
     def initialize(path, filepath=nil)
       @path = path
@@ -160,7 +161,7 @@ module Bliss
         end
         
         parser = self
-        @autodetect_compression = true
+        @autodetect_compression = true if @autodetect_compression.nil?
         compression = :none
         if @autodetect_compression
           http.headers do
