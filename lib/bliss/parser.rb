@@ -6,12 +6,16 @@ module Bliss
     attr_accessor :unhandled_bytes
     attr_accessor :autodetect_compression
 
-    def initialize(path, filepath=nil)
+    def initialize(path, filepath=nil, authorization=nil)
       @path = path
-      
+
       if filepath
         @file = File.new(filepath, 'w')
         @file.autoclose = false
+      end
+
+      if authorization
+        @user, @pass = authorization
       end
 
       @header = nil
@@ -24,7 +28,7 @@ module Bliss
       @machine_builder = Bliss::ParserMachineBuilder.new(self)
       self
     end
-    
+
     def on_error(&block)
       @machine_builder.on_error(&block)
     end
@@ -72,7 +76,7 @@ module Bliss
       @max_unhandled_bytes = bytes
       @on_max_unhandled_bytes = block
     end
-    
+
     def initialize_push_parser
       @parser_machine, @push_parser = @machine_builder.build_parser_machine
       reset_unhandled_bytes
@@ -147,6 +151,10 @@ module Bliss
       end
     end
 
+    def require_auth?
+      !@user.nil? && !@pass.nil?
+    end
+
     def parse
       reset_unhandled_bytes if check_unhandled_bytes?
       #load_constraints_on_parser_machine
@@ -154,12 +162,16 @@ module Bliss
 
       EM.run do
         http = nil
+        options = {}
+
+        require_auth? && options = {:head => {'authorization' => [@user, @pass]}}
+
         if @timeout
-          http = EM::HttpRequest.new(@path, :connect_timeout => @timeout, :inactivity_timeout => @timeout).get
+          http = EM::HttpRequest.new(@path, :connect_timeout => @timeout, :inactivity_timeout => @timeout).get options
         else
-          http = EM::HttpRequest.new(@path).get
+          http = EM::HttpRequest.new(@path).get options
         end
-        
+
         parser = self
         @autodetect_compression = true if @autodetect_compression.nil?
         compression = :none
