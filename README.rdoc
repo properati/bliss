@@ -27,11 +27,17 @@
   parser.on_timeout(5) {
     puts 'Timeout!'
   }
-  
+
   parser.parse
 
+Basic authentication support was added to Bliss.   
+To perform a Basic-Auth, pass the username and password as argument when instantiate the parser:
+
+  parser = Bliss::Parser.new(path, 'output.xml', [username, password])
+
+
 == Contributing to bliss
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
