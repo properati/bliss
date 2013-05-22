@@ -61,6 +61,7 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.5.5"])
+      s.add_runtime_dependency(%q<rubyzip>, ["~> 0.9.9"])
       s.add_runtime_dependency(%q<eventmachine>, ["= 1.0.0.rc.4"])
       s.add_runtime_dependency(%q<em-http-request>, [">= 1.0.2"])
       s.add_development_dependency(%q<rspec>, ["~> 2.11.0"])
@@ -69,6 +70,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, [">= 0"])
     else
       s.add_dependency(%q<nokogiri>, [">= 1.5.5"])
+      s.add_dependency(%q<rubyzip>, ["~> 0.9.9"])
       s.add_dependency(%q<eventmachine>, ["= 1.0.0.rc.4"])
       s.add_dependency(%q<em-http-request>, [">= 1.0.2"])
       s.add_dependency(%q<rspec>, ["~> 2.11.0"])
@@ -78,6 +80,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<nokogiri>, [">= 1.5.5"])
+    s.add_dependency(%q<rubyzip>, ["~> 0.9.9"])
     s.add_dependency(%q<eventmachine>, ["= 1.0.0.rc.4"])
     s.add_dependency(%q<em-http-request>, [">= 1.0.2"])
     s.add_dependency(%q<rspec>, ["~> 2.11.0"])
