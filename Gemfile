@@ -6,6 +6,7 @@ source "http://rubygems.org"
 gem "nokogiri", ">= 1.5.5"
 gem "eventmachine", "= 1.0.0.rc.4"
 gem "em-http-request", ">= 1.0.2"
+gem "rubyzip", "~> 0.9.9"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
