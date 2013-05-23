@@ -173,7 +173,6 @@ module Bliss
         while !stream.eof?
           self.parse_chunk(stream.sysread(100000).chomp)
         end
-        stream.close
       end
       File.delete(temp_file)
       file_close
