@@ -162,20 +162,21 @@ module Bliss
       reset_unhandled_bytes if check_unhandled_bytes?
       self.initialize_push_parser
 
-      compressed_data = open(@path).read
-      temp_file = File.join("/tmp", "bliss_tmp_#{Time.now.to_i}.zip")
-      fd = open(temp_file, "w")
-      fd.write(compressed_data)
-      fd.close
+      open(@path) do |compressed_data|
+        temp_file = File.join("/tmp", "bliss_tmp_#{Time.now.to_i}.zip")
+        fd = open(temp_file, "w")
+        fd.write(compressed_data.read)
+        fd.close
 
-      Zip::ZipInputStream.open(temp_file) do |stream|
-        entry = stream.get_next_entry
-        while !stream.eof?
-          self.parse_chunk(stream.sysread(100000).chomp)
+        Zip::ZipInputStream.open(temp_file) do |stream|
+          entry = stream.get_next_entry
+          while !stream.eof?
+            self.parse_chunk(stream.sysread(100000).chomp)
+          end
         end
+        file_close
+        File.delete(temp_file)
       end
-      File.delete(temp_file)
-      file_close
     end
 
     def parse
