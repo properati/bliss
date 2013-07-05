@@ -14,7 +14,6 @@ module Bliss
 
       if filepath
         @file = File.new(filepath, 'w')
-        @file.autoclose = false
       end
 
       if authorization
@@ -146,7 +145,9 @@ module Bliss
 
     def close
       @parser_machine.close
+      file_path = @file.path
       file_close
+      File.delete(file_path)
     end
 
     def trigger_error_callback(error_type, details={})
@@ -269,7 +270,7 @@ module Bliss
     end
 
     def file_close
-      if @file
+      if @file && !@file.closed?
         @file.close
       end
     end
