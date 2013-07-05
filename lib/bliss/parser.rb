@@ -146,6 +146,7 @@ module Bliss
 
     def close
       @parser_machine.close
+      file_close
     end
 
     def trigger_error_callback(error_type, details={})
