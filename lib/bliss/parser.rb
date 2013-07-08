@@ -185,6 +185,10 @@ module Bliss
       self.initialize_push_parser
 
       EM.run do
+        if not self.valid_url?(@path)
+          self.parse_file
+        end
+
         http = nil
         options = {}
 
@@ -345,6 +349,32 @@ module Bliss
         end
 
       end
+    end
+
+    def valid_url?(url)
+      require 'uri'
+      url =~ URI::regexp
+    end
+
+    def parse_file
+      File.open(@path, 'r') do |f|
+        while !f.eof?
+          self.parse_chunk(f.read)
+        end
+      end
+    rescue => err
+      # FIXME need a different callback for errors!
+      #puts "Bliss error: #{err}"
+      if @timeout
+        @on_timeout.call
+      end
+      self.secure_close
+    else
+      if @on_finished
+        @on_finished.call(http)
+      end
+    ensure
+      self.secure_close
     end
   end
 end
