@@ -371,7 +371,7 @@ module Bliss
       self.secure_close
     else
       if @on_finished
-        @on_finished.call(http)
+        @on_finished.call
       end
     ensure
       self.secure_close
