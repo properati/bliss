@@ -269,9 +269,7 @@ module Bliss
 
     def file_close
       if @file && !@file.closed?
-        file_path = @file.path
         @file.close
-        File.delete(file_path)
       end
     end
 
