@@ -20,7 +20,7 @@ def mocked_request(content, opts={})
 
   Addressable::URI.any_instance.stub(:validate) { nil }
   Addressable::URI.any_instance.stub(:port) { 80 }
-  Addressable::URI.any_instance.stub(:host) { 'mock' }
+  Addressable::URI.any_instance.stub(:host) { 'http://example.com/feed.xml' }
 
   http_response_header = mock(EM::HttpResponseHeader)
   http_response_header.stub(:compressed?) { opts[:compressed] }
@@ -37,5 +37,5 @@ def mocked_request(content, opts={})
   http_connection = mock(EM::HttpConnection)
   http_connection.stub(:get) { http_client }
   
-  EM::HttpRequest.should_receive(:new).with('mock').and_return(http_connection)
+  EM::HttpRequest.should_receive(:new).with('http://example.com/feed.xml').and_return(http_connection)
 end

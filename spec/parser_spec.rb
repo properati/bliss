@@ -15,7 +15,7 @@ describe Bliss::Parser do
     it "should parse" do
       mocked_request("<root><el>test</el></root>")
       
-      @parser = Bliss::Parser.new('mock')
+      @parser = Bliss::Parser.new('http://example.com/feed.xml')
 
       count = 0
       @parser.on_tag_close { |hash, depth|
@@ -45,7 +45,7 @@ describe Bliss::Parser do
 
       mocked_request(xml)
       
-      @parser = Bliss::Parser.new('mock')
+      @parser = Bliss::Parser.new('http://example.com/feed.xml')
 
       ads = []
       
@@ -83,7 +83,7 @@ describe Bliss::Parser do
 
       mocked_request(xml)
       
-      @parser = Bliss::Parser.new('mock')
+      @parser = Bliss::Parser.new('http://example.com/feed.xml')
 
       ads = []
       
@@ -105,7 +105,7 @@ describe Bliss::Parser do
     it "should parse" do
       mocked_request("<root><item><name><![CDATA[]]></name></item></root>")
       
-      @parser = Bliss::Parser.new('mock')
+      @parser = Bliss::Parser.new('http://example.com/feed.xml')
 
       format = Bliss::Format.new(File.dirname(File.expand_path(__FILE__)) + "/mock/tag_name_required.yml")
       format.reset_constraints_state
@@ -134,7 +134,7 @@ describe Bliss::Parser do
 
       mocked_request(xml)
       
-      @parser = Bliss::Parser.new('mock')
+      @parser = Bliss::Parser.new('http://example.com/feed.xml')
 
       
       @parser.on_tag_close("ads/ad") { |hash, depth|
@@ -161,7 +161,7 @@ describe Bliss::Parser do
 
       mocked_request(xml)
 
-      @parser = Bliss::Parser.new("mock", "test.xml")
+      @parser = Bliss::Parser.new('http://example.com/feed.xml', 'test.xml')
 
       @parser.on_tag_close("root/item") { |hash, depth|
         #puts hash.inspect
@@ -189,7 +189,7 @@ describe Bliss::Parser do
       XML
       mocked_request(xml)
 
-      @parser = Bliss::Parser.new("mock")
+      @parser = Bliss::Parser.new('http://example.com/feed.xml')
 
       @parser.on_tag_close("root/item") do |hash, depth|
         #puts "**** #{hash} ****"
@@ -211,7 +211,7 @@ describe Bliss::Parser do
 
       mocked_request(xml)
 
-      @parser = Bliss::Parser.new('mock', "test.xml")
+      @parser = Bliss::Parser.new('http://example.com/feed.xml', 'test.xml')
       res = []
       exceptions = []
 
@@ -243,7 +243,7 @@ describe Bliss::Parser do
 
       mocked_request(xml, {:compressed => true})
 
-      @parser = Bliss::Parser.new('mock', "test.xml")
+      @parser = Bliss::Parser.new('http://example.com/feed.xml', 'test.xml')
       @parser.on_max_unhandled_bytes(200000) {
         puts "Stopped parjsing caused content data for tag was too big!"
         @parser.close

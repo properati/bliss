@@ -187,6 +187,7 @@ module Bliss
       EM.run do
         if not self.valid_url?(@path)
           self.parse_file
+          next
         end
 
         http = nil
