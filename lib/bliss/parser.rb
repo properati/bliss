@@ -3,11 +3,14 @@ require "open-uri"
 
 module Bliss
   class Parser
+    MAX_REDIRECTS = 3
+
     attr_reader :header
     attr_reader :push_parser
     attr_reader :parser_machine
     attr_accessor :unhandled_bytes
     attr_accessor :autodetect_compression
+    attr_writer :redirects
 
     def initialize(path, filepath=nil, authorization=nil)
       @path = path
@@ -197,9 +200,9 @@ module Bliss
         require_auth? && options = {:head => {'authorization' => [@user, @pass]}}
 
         if @timeout
-          http = EM::HttpRequest.new(@path, :connect_timeout => @timeout, :inactivity_timeout => @timeout).get options
+          http = EM::HttpRequest.new(@path, :connect_timeout => @timeout, :inactivity_timeout => @timeout, :redirects => self.redirects).get options
         else
-          http = EM::HttpRequest.new(@path).get options
+          http = EM::HttpRequest.new(@path, :redirects => self.redirects).get options
         end
 
         parser = self
@@ -383,6 +386,10 @@ module Bliss
       end
     ensure
       self.secure_close
+    end
+
+    def redirects
+      @redirects ||= MAX_REDIRECTS
     end
   end
 end

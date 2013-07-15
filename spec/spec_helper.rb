@@ -37,5 +37,5 @@ def mocked_request(content, opts={})
   http_connection = mock(EM::HttpConnection)
   http_connection.stub(:get) { http_client }
   
-  EM::HttpRequest.should_receive(:new).with('http://example.com/feed.xml').and_return(http_connection)
+  EM::HttpRequest.should_receive(:new).with('http://example.com/feed.xml', :redirects => Bliss::Parser::MAX_REDIRECTS).and_return(http_connection)
 end
