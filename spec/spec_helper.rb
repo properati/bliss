@@ -31,7 +31,7 @@ def mocked_request(content, opts={})
   http_client.stub(:response_header) { http_response_header }
   http_client.stub(:headers).and_yield {}
   http_client.stub(:stream).and_yield(content) { }
-  http_client.stub(:errback).and_yield {}
+  http_client.stub(:errback).and_yield(nil) {}
   http_client.stub(:callback)
   
   http_connection = mock(EM::HttpConnection)

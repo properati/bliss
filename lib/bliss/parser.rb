@@ -33,6 +33,7 @@ module Bliss
 
     def on_error(&block)
       @machine_builder.on_error(&block)
+      @on_error = block
     end
 
     def on_tag_open(element='.', &block)
@@ -217,6 +218,8 @@ module Bliss
         decoder = nil
 
         http.stream do |chunk|
+          @streamed = true
+
           if compression != :none and decoder.nil?
             # valid decoders: "gzip", "deflate"
             decoder_class = EM::HttpDecoders.decoder_for_encoding(compression.to_s)
@@ -234,11 +237,17 @@ module Bliss
           end
         end
 
-        http.errback do
-          #puts 'errback'
-          if @timeout
+        http.errback do |http|
+          # If a timeout was set, and nothing was streamed,
+          # a "connection timeout" ocurred
+          if @timeout && !@streamed
             @on_timeout.call
           end
+
+          if @on_error
+            @on_error.call("http", http.error)
+          end
+
           parser.secure_close
         end
 
@@ -364,10 +373,8 @@ module Bliss
         end
       end
     rescue => err
-      # FIXME need a different callback for errors!
-      #puts "Bliss error: #{err}"
-      if @timeout
-        @on_timeout.call
+      if @on_error
+        @on_error.call(err.class.name, err.message)
       end
       self.secure_close
     else
