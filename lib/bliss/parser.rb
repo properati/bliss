@@ -341,7 +341,7 @@ module Bliss
             end
             next
           end
-          if @file
+          if @file && !@file.closed?
             @file << line
           end
         else
