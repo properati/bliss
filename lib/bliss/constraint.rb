@@ -54,16 +54,12 @@ module Bliss
                 content = hash[key]
                 #puts content
                 #puts @possible_values.inspect
-                if @possible_values.include?(content)
+                if @possible_values.include?(content.downcase)
                   found = true
                   break
                 end
               end
-              if found
-                @state = :passed
-              else
-                @state = :not_passed
-              end
+              @state = (found ? :passed : :not_passed)
             end
           #when :not_blank
           #  if hash.has_key?(field) and !hash[field].to_s.empty?
