@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "nokogiri", ">= 1.5.5"
-  spec.add_runtime_dependency "rubyzip", "~> 0.9.9"
+  spec.add_runtime_dependency "rubyzip", ">= 0.9.9", "< 2.4.0"
   spec.add_runtime_dependency "eventmachine", "= 1.0.0.rc.4"
   spec.add_runtime_dependency "em-http-request", ">= 1.0.2"
 
